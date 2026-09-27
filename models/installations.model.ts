@@ -104,6 +104,12 @@ export const updateInstallationItemPartial = async (
   return result.rows[0] || null;
 };
 
+
+
+
+
+
+
 // Partial update for installation
 export const updateInstallation = async (
   id: number,
@@ -135,6 +141,12 @@ export const updateInstallation = async (
 
   return result.rows[0] || null;
 };
+
+
+
+
+
+
 
 // Delete installation record
 export const deleteInstallation = async (id: number) => {
