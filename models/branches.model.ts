@@ -32,13 +32,39 @@ export const deleteBranch=async(id:number)=>{
     return result.rows[0];
 }
 
-//update a branch by id
-export const updateBranch=async(
-    id:number,
-    name:string,
-    code:string
-)=>{
-    //query to update the values
-    const query=`UPDATE branches
-    SET name=$1,`
+
+export interface Branch {
+  id: number;
+  name: string;
+  code: string;
+  created_at?: Date;
+  updated_at?: Date;
 }
+
+//updates a branch by its id
+export const updateBranch = async (
+  id: number,
+  name: string,
+  code: string
+): Promise<Branch | null> => {
+  try {
+    const query = `
+      UPDATE branches 
+      SET name = $1, code = $2 
+      WHERE id = $3 
+      RETURNING *;
+    `;
+    const values = [name, code, id];
+    const result = await db.query(query, values);
+
+    // Return null if no row was updated (e.g., non-existent ID)
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    return result.rows[0];
+  } catch (error) {
+    console.error(`Error updating branch with ID ${id}:`, error);
+    throw error;
+  }
+};
