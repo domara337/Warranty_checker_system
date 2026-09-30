@@ -50,3 +50,36 @@ export const createNewBranch=async(req:any,res:any)=>{
         return res.status(500).json({error:error instanceof Error ? error.message:String(error)});
     }
 }
+
+
+export const RemoveBranch=async(req:any,res:any)=>{
+    try{
+        //extract branch ID from request parameters
+        const {id}=req.params;
+
+        //Excute Branch deletion query
+        const deletedBranch=await deleteBranch(id);
+
+        //return 404 error if branch was missing
+        if(!deletedBranch) return res.status(404).json({error:"Branch Not found"})
+
+        //Confirm deletion sucess to client
+        return res.status(200).json({message:"Branch deleted Successfully"});
+    }
+    catch(error){
+        return res.status(500).json({error:error instanceof Error ? error.message:String(error)});
+
+    }
+}
+
+export const updatedBranch=async(req:any,res:any)=>{
+try{
+
+
+
+
+}
+catch(error){
+    return res.status(500).json({error:error instanceof Error ? error.message:String(error) })
+}
+}

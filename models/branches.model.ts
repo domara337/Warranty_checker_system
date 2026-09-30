@@ -1,5 +1,12 @@
 import db from '../config/db.js';
 
+
+export interface Branch{
+    id:number;
+    name:string;
+    code:string;
+
+}
 //get all branches
 export const getAllBranches=async()=>{
     const result=await db.query('SELECT * FROM branches ORDER BY id ASC');
@@ -25,9 +32,13 @@ export const deleteBranch=async(id:number)=>{
     return result.rows[0];
 }
 
-//Update a branch by id
-export const updateBranch=async(id:number,name:string,code:string)=>{
-    const result=await db.query('UPDATE branches SET name=$1,code=$2 WHERE id=$3 RETURNING *',[name,code,id]);
-    return result.rows[0];
+//update a branch by id
+export const updateBranch=async(
+    id:number,
+    name:string,
+    code:string
+)=>{
+    //query to update the values
+    const query=`UPDATE branches
+    SET name=$1,`
 }
-
