@@ -1,85 +1,173 @@
-import {getAllBranches,getBranchById,createBranch,deleteBranch,updateBranch} from '../models/branches.model.ts';
+import { Request, Response } from 'express';
+import {
+  getAllBranches,
+  getBranchById,
+  createBranch,
+  deleteBranch,
+  updateBranch
+} from '../models/branches.model.ts';
 
-//controller to fetch all branches offices(ER,BAGH,BAS)
-export const fetchAllBranches=async(req:any,res:any)=>{
-    try{
-        //Query model for list of all active branches
-        const branches=await getAllBranches();
 
-        //return array of branches as json response
-        return res.status(200).json(branches);
-    }catch(error){
-        return res.status(500).json({error:error instanceof Error ? error.message : String(error)});
+
+
+/**
+ * Fetch all branch offices
+ */
+export const fetchAllBranches = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const branches = await getAllBranches();
+    return res.status(200).json({
+      success: true,
+      data: branches,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+};
+
+
+
+
+/**
+ * Retrieve a single branch by ID
+ */
+export const fetchBranchById = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { id } = req.params;
+    const branchId = Number(id);
+
+    if (isNaN(branchId)) {
+      return res.status(400).json({ success: false, message: 'Invalid branch ID format.' });
     }
-}
 
-//controller to retrieve a single branch by ID
-export const fetchBranchById=async(req:any,res:any)=>{
-    try{
-      const {id}=req.params;
-      
-      const branch=await getBranchById(Number(id));
+    const branch = await getBranchById(branchId);
 
-      if(!branch){
-        return res.status(404).json({erorr:`Branch not found`})
-
-        
-      }
-      //successful retrieval of branch by ID
-      return res.status(200).json(branch);
-
-
+    if (!branch) {
+      return res.status(404).json({ success: false, message: 'Branch not found.' });
     }
-    catch(error){
-        return res.status(500).json({error:error instanceof Error ? error.message:String(error)});
 
+    return res.status(200).json({
+      success: true,
+      data: branch,
+    });
+  
+
+} catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+};
+
+
+
+/**
+ * Create a new branch
+ */
+export const createNewBranch = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { name, code } = req.body;
+
+    if (!name || typeof name !== 'string' || !code || typeof code !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Both "name" and "code" are required and must be strings.',
+      });
     }
-}
 
-//controller to create a new branch
-export const createNewBranch=async(req:any,res:any)=>{
-    try{
-        const {name,code}=req.body;
+    const newBranch = await createBranch(name.trim(), code.trim());
 
-        //insert new branch into database
-        const newBranch=await createBranch(name,code);
+    return res.status(201).json({
+      success: true,
+      data: newBranch,
+      message: 'Branch created successfully.',
+    });
 
-        return res.status(201).json(newBranch);
+} catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+};
 
-    }catch(error){
-        return res.status(500).json({error:error instanceof Error ? error.message:String(error)});
+/**
+ * Remove a branch by ID
+ */
+export const removeBranch = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { id } = req.params;
+    const branchId = Number(id);
+
+    if (isNaN(branchId)) {
+      return res.status(400).json({ success: false, message: 'Invalid branch ID format.' });
     }
-}
 
+    const deletedBranch = await deleteBranch(branchId);
 
-export const RemoveBranch=async(req:any,res:any)=>{
-    try{
-        //extract branch ID from request parameters
-        const {id}=req.params;
-
-        //Excute Branch deletion query
-        const deletedBranch=await deleteBranch(id);
-
-        //return 404 error if branch was missing
-        if(!deletedBranch) return res.status(404).json({error:"Branch Not found"})
-
-        //Confirm deletion sucess to client
-        return res.status(200).json({message:"Branch deleted Successfully"});
+    if (!deletedBranch) {
+      return res.status(404).json({ success: false, message: 'Branch not found.' });
     }
-    catch(error){
-        return res.status(500).json({error:error instanceof Error ? error.message:String(error)});
 
+    return res.status(200).json({
+      success: true,
+      message: 'Branch deleted successfully.',
+    });
+
+} catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+};
+
+/**
+ * Update a branch record by ID
+ */
+export const editBranch = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { id } = req.params;
+    const { name, code } = req.body;
+
+    // 1. Validate ID param
+    const branchId = Number(id);
+    if (isNaN(branchId)) {
+      return res.status(400).json({ success: false, message: 'Invalid branch ID format.' });
     }
-}
 
-export const updatedBranch=async(req:any,res:any)=>{
-try{
+    // 2. Validate request body parameters
+    if (!name || typeof name !== 'string' || !code || typeof code !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Both "name" and "code" are required fields and must be strings.',
+      });
+    }
 
+    // 3. Execute model update query
+    const updatedBranch = await updateBranch(branchId, name.trim(), code.trim());
 
+    // 4. Handle non-existent resource
+    if (!updatedBranch) {
+      return res.status(404).json({ success: false, message: `Branch with ID ${branchId} not found.` });
+    }
 
+    // 5. Send success response
+    return res.status(200).json({
+      success: true,
+      data: updatedBranch,
+      message: 'Branch updated successfully.',
+    });
+  
 
-}
-catch(error){
-    return res.status(500).json({error:error instanceof Error ? error.message:String(error) })
-}
-}
+} catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+};
