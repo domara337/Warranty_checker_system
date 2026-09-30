@@ -25,7 +25,7 @@ export const deleteBrand=async(id:number)=>{
 }
 
 //update a brand by id
-export const updateBrand=async(id:number,name:string,code:string)=>{
-    const result=await db.query('UPDATE brands SET name=$1,code=$2 WHERE id=$3 RETURNING *',[name,code,id]);
+export const updateBrand=async(id:number,name:string)=>{
+    const result=await db.query('UPDATE brands SET name=$1 WHERE id=$2 RETURNING *',[name,id]);
     return result.rows[0];
 }
