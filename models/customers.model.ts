@@ -25,8 +25,8 @@ export const findCustomerByPhoneNumber=async (phone_number: string) => {
 };
 
 //Insert a new Customer
-export const createCustomer=async(fullname:string,email:string,phone_number:string,address:string)=>{
-    const result=await db.query('INSERT INTO customers(full_name,email,phone_number,address) VALUES($1,$2,$3,$4) RETURNING *' ,[fullname,email,phone_number,address]);
+export const createCustomer=async(full_name:string,phone_number:string,address:string,contact_name:string,email:string)=>{
+    const result=await db.query('INSERT INTO customers(name,mobile,address,contact_name,email) VALUES($1,$2,$3,$4,$5) RETURNING *' ,[full_name,phone_number,address,contact_name,email]);
     return result.rows[0];
 }
 
@@ -35,3 +35,29 @@ export const deleteCustomer=async(id:number)=>{
     const result=await db.query('DELETE FROM customers WHERE id=$1 RETURNING *',[id]);
     return result.rows[0];
 }
+
+// Update customer dynamically
+export const updateCustomer = async (id: number, fields: Record<string, any>) => {
+    const keys = Object.keys(fields);
+    
+    // If no fields are provided to update, return the existing record
+    if (keys.length === 0) {
+        return getCustomerbyId(id);
+    }
+
+    // Construct "column_name = $1, column_name = $2, ..."
+    const setClause = keys
+        .map((key, index) => `${key} = $${index + 1}`)
+        .join(', ');
+
+    const values = [...Object.values(fields), id];
+    const query = `
+        UPDATE customers 
+        SET ${setClause} 
+        WHERE id = $${keys.length + 1} 
+        RETURNING *
+    `;
+
+    const result = await db.query(query, values);
+    return result.rows[0];
+};
