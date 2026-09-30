@@ -5,7 +5,8 @@ export interface Branch{
     id:number;
     name:string;
     code:string;
-
+ created_at?: Date;
+  updated_at?: Date;
 }
 //get all branches
 export const getAllBranches=async()=>{
@@ -33,13 +34,7 @@ export const deleteBranch=async(id:number)=>{
 }
 
 
-export interface Branch {
-  id: number;
-  name: string;
-  code: string;
-  created_at?: Date;
-  updated_at?: Date;
-}
+
 
 //updates a branch by its id
 export const updateBranch = async (
