@@ -13,8 +13,8 @@ export const getBrandByid=async(id:number)=>{
 }
 
 //Insert a new brand
-export const createBrand=async(name:string,code:string)=>{
-    const result=await db.query('INSERT INTO brands(name,code) VALUES($1,$2) RETURNING *' ,[name,code]);
+export const createBrand=async(name:string)=>{
+    const result=await db.query('INSERT INTO brands(name) VALUES($1) RETURNING *' ,[name]);
     return result.rows[0];
 }
 
