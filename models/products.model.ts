@@ -1,5 +1,11 @@
 import db from '../config/db.js';
 
+export const getProducts=async()=>{
+    const result=await db.query(
+        `SELECT * FROM product`
+    )
+    return result.rows;
+}
 
 //get all products with brand name 
 export const getProductsWithBrandName=async()=>{
@@ -39,28 +45,42 @@ export const deleteProduct=async(id:number)=>{
 
 //Update a product by id
 export const UpdateProduct = async (
-    product_id:any,
-    part_number:string,
-    brand_id:number,
-    model_name:string,
-    category:string
+    product_id: any,
+    data: {
+        part_number?: string;
+        brand_id?: number;
+        model_name?: string;
+        category?: string;
+    }
 ) => {
-    const result = await db.query(
-        `UPDATE products 
-         SET part_number = $1, 
-             brand_id= $2, 
-             model_name = $3, 
-             category= $4, 
-              
-         WHERE id = $5 
-         RETURNING *`,
-        [
-           part_number,
-            brand_id,
-            model_name,
-            category,
-            product_id
-        ]
-    );
+    const fields: string[] = [];
+    const values: any[] = [];
+    let paramIndex = 1;
+
+    // Dynamically add fields if they are provided in the payload
+    Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined) {
+            fields.push(`${key} = $${paramIndex}`);
+            values.push(value);
+            paramIndex++;
+        }
+    });
+
+    // If no fields are provided to update, return early
+    if (fields.length === 0) {
+        throw new Error("No fields provided for update.");
+    }
+
+    // Append product_id as the final parameter for the WHERE clause
+    values.push(product_id);
+
+    const query = `
+        UPDATE products 
+        SET ${fields.join(", ")}
+        WHERE id = $${paramIndex} 
+        RETURNING *
+    `;
+
+    const result = await db.query(query, values);
     return result.rows[0];
 };
