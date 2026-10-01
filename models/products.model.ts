@@ -7,16 +7,26 @@ export const getProducts=async()=>{
     return result.rows;
 }
 
-//get all products with brand name 
-export const getProductsWithBrandName=async()=>{
-    const result =await db.query(
-        `SELECT p.* ,b.name as brand_name 
-        FROM products p
-        JOIN brands b ON p.brand_id=b.id
-        ORDER BY p.model_name ASC`
-    );
-    return result.rows;
-}
+// get all products with optional brand filter
+export const getProductsWithBrandName = async (brand?: string) => {
+  let query = `
+    SELECT p.*, b.name as brand_name 
+    FROM products p
+    JOIN brands b ON p.brand_id = b.id
+  `;
+  const values: any[] = [];
+
+  if (brand) {
+    // ILIKE performs a case-insensitive search matching brand or model
+    query += ` WHERE b.name ILIKE $1 OR p.model_name ILIKE $1`;
+    values.push(`%${brand}%`);
+  }
+
+  query += ` ORDER BY p.model_name ASC`;
+
+  const result = await db.query(query, values);
+  return result.rows;
+};
 
 //Find product by exact part number
 export const getProductByPartNumber=async(part_number:string)=>{

@@ -112,7 +112,7 @@ try{
     return res.status(400).json({message:"no fields provided for update"})
 
   }
-  const allowedFields = ['name', 'mobile', 'address', 'contact_name', 'email'];
+  const allowedFields = ['full_name', 'mobile', 'address', 'contact_name', 'email'];
         const sanitizedFields: Record<string, any> = {};
 
         for (const [key, value] of Object.entries(fieldsToUpdate)) {
