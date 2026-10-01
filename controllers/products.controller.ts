@@ -35,11 +35,18 @@ export const getAllProducts = async (req: Request, res: Response): Promise<Respo
   }
 };
 
-// Controller to retrieve all products along with their brand names
 export const getProductBybrand = async (req: Request, res: Response): Promise<Response> => {
   try {
-    // Call database function to join products and brands
-    const products = await getProductsWithBrandName();
+    // 1. Extract query parameter (e.g. ?brand=hp or ?q=hp e877)
+    const brand = req.query.brand as string | undefined;
+
+    // 2. Pass the search term to your database query function
+    const products = await getProductsWithBrandName(brand);
+
+    if (!products.length) {
+      return res.status(404).json({ message: "No products found matching that brand or query." });
+    }
+
     return res.status(200).json(products);
   } catch (error) {
     return res.status(500).json({
