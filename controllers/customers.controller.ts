@@ -59,9 +59,9 @@ export const getCustomer = async (req:any, res:any) => {
 export const addCustomer = async (req:any, res:any) => {
   try {
     // Destructure customer details from request payload
-    const { full_name, phone_number,address,contact_name,email } = req.body;
+    const { full_name, mobile,address,contact_name,email } = req.body;
     // Insert new customer into database table
-    const newCustomer = await createCustomer(full_name, phone_number,address,contact_name,email);
+    const newCustomer = await createCustomer(full_name, mobile,address,contact_name,email);
     // Return created customer object with status 201
     return res.status(201).json(newCustomer);
   } catch (error) {
