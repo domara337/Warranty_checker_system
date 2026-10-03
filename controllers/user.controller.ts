@@ -17,7 +17,17 @@ export const login = async (req:any, res:any) => {
     // Return 401 error if password verification fails
     if (!isMatch) return res.status(401).json({ error: "Invalid email or password." });
     // Respond with success message and user account details
-    return res.status(200).json({ message: "Login successful", user: { id: user.id, email: user.email, role: user.role } });
+  // What you need to add
+const jwt = require('jsonwebtoken');
+
+const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role }, 
+    process.env.JWT_SECRET, 
+    { expiresIn: '1h' }
+);
+
+return res.status(200).json({ token, user });
+
   } catch (error) {
     // Catch server errors and return 500 status code
     return res.status(500).json({
