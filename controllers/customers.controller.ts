@@ -96,10 +96,10 @@ export const removeCustomer = async (req:any, res:any) => {
 export const UpdatedCustomer=async(req:any, res:any)=>{
 try{
 
-  const id=parseInt(req.params.id,10);
+  const {id}=req.params;
 
   //validate ID parameter
-  if(isNaN(id)){
+  if(!id){
     return res.status(400).json({message:'Invalid customer ID'})
 
   }
@@ -112,7 +112,7 @@ try{
     return res.status(400).json({message:"no fields provided for update"})
 
   }
-  const allowedFields = ['full_name', 'mobile', 'address', 'contact_name', 'email'];
+  const allowedFields = ['name', 'city','mobile', 'address', 'contact_person'];
         const sanitizedFields: Record<string, any> = {};
 
         for (const [key, value] of Object.entries(fieldsToUpdate)) {

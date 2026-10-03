@@ -93,10 +93,10 @@ export const createWarranty = async (req: Request, res: Response): Promise<void>
     const newItem = await CreateWarrantyItem(
       serial_number,
       label_id,
-      Number(product_id),
-      Number(branch_id),
-      Number(customer_id),
-      Number(warranty_months),
+      product_id,
+      branch_id,
+      customer_id,
+      warranty_months,
       new Date(warranty_start_date),
       new Date(warranty_end_date)
     );
@@ -104,7 +104,7 @@ export const createWarranty = async (req: Request, res: Response): Promise<void>
     res.status(201).json({ success: true, data: newItem });
   } catch (error) {
     console.error('Error creating warranty item:', error);
-    res.status(500).json({ success: false, message: 'Server error while creating warranty item.' });
+    res.status(500).json({ success: false, message: 'Server error while creating warranty item.',error: error instanceof Error ? error.message : String(error) });
   }
 };
 
