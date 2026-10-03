@@ -16,8 +16,7 @@ export const login = async (req:any, res:any) => {
     const isMatch = await bcrypt.compare(password, user.password_hash);
     // Return 401 error if password verification fails
     if (!isMatch) return res.status(401).json({ error: "Invalid email or password." });
-    // Respond with success message and user account details
-  // What you need to add
+    // Respond with success message and user account details(and token if applicable)
 const jwt = require('jsonwebtoken');
 
 const token = jwt.sign(

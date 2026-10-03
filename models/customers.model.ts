@@ -25,8 +25,8 @@ export const findCustomerByPhoneNumber=async (phone_number: string) => {
 };
 
 //Insert a new Customer
-export const createCustomer=async(full_name:string,phone_number:string,address:string,contact_name:string,email:string)=>{
-    const result=await db.query('INSERT INTO customers(name,mobile,address,contact_name,email) VALUES($1,$2,$3,$4,$5) RETURNING *' ,[full_name,phone_number,address,contact_name,email]);
+export const createCustomer=async(full_name:string,mobile:string,address:string,city:string,contact_person:string)=>{
+    const result=await db.query('INSERT INTO customers(name,mobile,city,address,contact_person) VALUES($1,$2,$3,$4,$5) RETURNING *' ,[full_name,mobile,address,city,contact_person]);
     return result.rows[0];
 }
 
