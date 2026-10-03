@@ -21,7 +21,7 @@ export const login = async (req:any, res:any) => {
   } catch (error) {
     // Catch server errors and return 500 status code
     return res.status(500).json({
-         message: error instanceof Error ?error:String(error) });
+         message: error instanceof Error ?error.message:String(error) });
   }
 };
 
@@ -44,7 +44,7 @@ export const register = async (req:any, res:any) => {
     // Return server error status if insertion fails
     return res.status(500).json({ 
         success:false,
-        message: error instanceof Error?error:String(error) });
+        message: error instanceof Error?error.message:String(error) });
   }
 };
 
@@ -62,7 +62,7 @@ export const RetrieveUsers = async (req:any, res:any) => {
     return res.status(500).
     json({ 
         success:false,
-        message:error instanceof Error ? error:String(error)
+        message:error instanceof Error ? error.message:String(error)
      });
   }
 };
@@ -83,7 +83,7 @@ export const getUser = async (req:any, res:any) => {
     return res.status(500).
     json({ 
         success:false,
-        message:error instanceof Error ? error:String(error)
+        message:error instanceof Error ? error.message:String(error)
      });
   }
 };
@@ -103,6 +103,6 @@ export const removeUser = async (req:any, res:any) => {
     // Handle database error and return 500 status code
     return res.status(500).json({ 
         success:false,
-        message:error instanceof Error?error:String(error) });
+        message:error instanceof Error?error.message:String(error) });
   }
 };
