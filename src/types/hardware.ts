@@ -1,0 +1,37 @@
+export interface Branch {
+  id: number;
+  name: string;
+  code: string;
+}
+
+export interface Brand {
+  id: number;
+  name: string;
+}
+
+export interface Product {
+  id: number;
+  part_number: string;
+  brand_id: number;
+  model_name: string;
+  category?: string;
+  
+}
+
+export interface Customer {
+  id: string | number;
+  full_name: string;
+  mobile?: string;
+  city?: string;
+  address?:string;
+  contact_person?: string;
+}
+
+export interface Installation {
+  id?: number | string;
+  warranty_item_id: number | string;
+  version: string;
+  size: string;
+  installation_date: string;
+  notes: string;
+}
