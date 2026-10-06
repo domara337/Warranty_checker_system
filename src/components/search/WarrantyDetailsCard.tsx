@@ -1,51 +1,54 @@
 import React from 'react';
-import type { WarrantySearchResult } from '../../types';
 import { StatusBadge } from '../common/StatusBadge';
 import { formatDate } from '../../utils/formatters';
+import type { WarrantySearchResult } from '../../types';
+
+const FIELDS: Array<{ label: string; render: (data: WarrantySearchResult) => React.ReactNode }> = [
+  { label: 'Product Model', render: (d) => (
+    <>
+      <span className="block font-semibold text-slate-800 dark:text-slate-200">{d.model_name}</span>
+      <span className="block text-xs text-slate-500">{d.part_number}</span>
+    </>
+  ) },
+  { label: 'Branch', render: (d) => <span className="font-semibold text-slate-800 dark:text-slate-200">{d.branch_name}</span> },
+  { label: 'Days Remaining', render: (d) => (
+    <span className="font-semibold text-blue-600 dark:text-blue-400">{d.days_remaining} days</span>
+  ) },
+  { label: 'Warranty Period', render: (d) => (
+    <span className="font-medium text-slate-700 dark:text-slate-300">
+      {formatDate(d.warranty_start_date)} &ndash; {formatDate(d.warranty_end_date)}
+    </span>
+  ) },
+  { label: 'Customer Name', render: (d) => <span className="font-medium text-slate-700 dark:text-slate-300">{d.customer_name}</span> },
+  { label: 'Contact / Mobile', render: (d) => (
+    <span className="font-medium text-slate-700 dark:text-slate-300">
+      {d.contact_person || 'N/A'} &middot; {d.customer_mobile || 'N/A'}
+    </span>
+  ) },
+];
 
 export const WarrantyDetailsCard: React.FC<{ data: WarrantySearchResult }> = ({ data }) => {
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
-      <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-700 pb-3">
-        <div>
-          <span className="text-xs font-mono text-slate-400">SERIAL NUMBER</span>
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white">{data.serial_number}</h3>
-          <p className="text-xs text-slate-500">Label ID: {data.label_id || 'N/A'}</p>
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      {/* Identity strip */}
+      <div className="flex items-start justify-between gap-4 border-b border-slate-200 bg-slate-50 px-5 py-4 dark:border-slate-800 dark:bg-slate-800/40">
+        <div className="min-w-0">
+          <span className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">Serial Number</span>
+          <h3 className="truncate font-mono text-lg font-bold text-slate-900 dark:text-white">{data.serial_number}</h3>
+          <p className="mt-0.5 text-xs text-slate-500">Label ID: {data.label_id || 'N/A'}</p>
         </div>
         <StatusBadge status={data.status} />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-        <div>
-          <p className="text-xs text-slate-400">Product Model</p>
-          <p className="font-semibold text-slate-800 dark:text-slate-200">{data.model_name}</p>
-          <p className="text-xs text-slate-500">{data.part_number}</p>
-        </div>
-        <div>
-          <p className="text-xs text-slate-400">Branch</p>
-          <p className="font-semibold text-slate-800 dark:text-slate-200">{data.branch_name}</p>
-        </div>
-        <div>
-          <p className="text-xs text-slate-400">Days Remaining</p>
-          <p className="font-semibold text-blue-600 dark:text-blue-400">{data.days_remaining} Days</p>
-        </div>
-        <div>
-          <p className="text-xs text-slate-400">Warranty Period</p>
-          <p className="font-medium text-slate-700 dark:text-slate-300">
-            {formatDate(data.warranty_start_date)} - {formatDate(data.warranty_end_date)}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs text-slate-400">Customer Name</p>
-          <p className="font-medium text-slate-700 dark:text-slate-300">{data.customer_name}</p>
-        </div>
-        <div>
-          <p className="text-xs text-slate-400">Contact / Mobile</p>
-          <p className="font-medium text-slate-700 dark:text-slate-300">
-            {data.contact_person || 'N/A'} ({data.customer_mobile || 'N/A'})
-          </p>
-        </div>
-      </div>
+      {/* Detail grid */}
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-5 px-5 py-5 md:grid-cols-3">
+        {FIELDS.map((field) => (
+          <div key={field.label} className="min-w-0">
+            <dt className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">{field.label}</dt>
+            <dd className="mt-1 text-sm break-words">{field.render(data)}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   );
 };

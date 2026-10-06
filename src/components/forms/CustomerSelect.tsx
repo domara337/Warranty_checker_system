@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import type { Customer } from '../../types';
 import { getCustomers, createCustomer } from '../../api/masterData';
+import { Input } from '../common/Input';
+import { Select } from '../common/Select';
+import { Button } from '../common/Button';
 
-
-//define the props for the CustomerSelect component
 interface CustomerSelectProps {
   value: number | string;
-  onChange: (id: string|number) => void;
+  onChange: (id: string | number) => void;
 }
-
 
 // CustomerSelect component allows users to select a customer from a dropdown or create a new one
 export const CustomerSelect: React.FC<CustomerSelectProps> = ({ value, onChange }) => {
@@ -16,11 +16,6 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({ value, onChange 
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
-
-
-  useEffect(() => {
-    loadCustomers();
-  }, []);
 
   const loadCustomers = async () => {
     try {
@@ -31,13 +26,17 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({ value, onChange 
     }
   };
 
+  useEffect(() => {
+    loadCustomers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const newCust = await createCustomer({ 
-        full_name: name, 
-        mobile: mobile, 
-      
+      const newCust = await createCustomer({
+        full_name: name,
+        mobile: mobile,
       });
       setCustomers([...customers, newCust]);
       onChange(newCust.id);
@@ -45,70 +44,81 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({ value, onChange 
       setName('');
       setMobile('');
     } catch (err) {
+      console.error('Failed to create customer', err);
       alert('Failed to create customer');
     }
   };
 
   return (
-    <div className="flex flex-col gap-1.5 w-full">
-      <div className="flex justify-between items-center">
+    <div className="flex w-full flex-col gap-1.5">
+      <div className="flex items-center justify-between gap-3">
         <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Customer</label>
         <button
           type="button"
           onClick={() => setShowModal(true)}
-          className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+          className="inline-flex items-center gap-1 rounded text-xs font-semibold text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
         >
-          + New Customer
+          <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          New Customer
         </button>
       </div>
-      <select
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full px-3.5 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
+
+      <Select value={value} onChange={(e) => onChange(e.target.value === '' ? '' : Number(e.target.value))}>
         <option value="">Select Customer...</option>
         {customers.map((c) => (
           <option key={c.id} value={c.id}>
-            {/* Fixed property name from c.phone to c.mobile to match the API payload */}
             {c.full_name} {c.mobile ? `(${c.mobile})` : ''}
           </option>
         ))}
-      </select>
+      </Select>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50">
-          <form onSubmit={handleCreate} className="bg-white dark:bg-slate-800 p-5 rounded-xl max-w-sm w-full space-y-4">
-            <h3 className="font-bold text-slate-900 dark:text-white">Add New Customer</h3>
-            <input
-              placeholder="Customer / Company Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full p-2 border rounded text-sm dark:bg-slate-900 dark:border-slate-700"
-              required
-            />
-            <input
-              placeholder="Mobile Phone"
-              /* Fixed state variable from phone to mobile to match useState */
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
-              className="w-full p-2 border rounded text-sm dark:bg-slate-900 dark:border-slate-700"
-            />
-            <div className="flex gap-2 justify-end">
-              <button 
-                type="button" 
-                onClick={() => setShowModal(false)} 
-                className="px-3 py-1 text-sm"
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit" 
-                className="px-3 py-1 bg-blue-600 text-white text-sm rounded"
-              >
-                Save
-              </button>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowModal(false);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-customer-title"
+            className="w-full max-w-sm overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900"
+          >
+            <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+              <h3 id="add-customer-title" className="text-base font-semibold text-slate-900 dark:text-white">
+                Add New Customer
+              </h3>
+              <p className="mt-0.5 text-sm text-slate-500">Creates a customer record instantly.</p>
             </div>
-          </form>
+
+            <form onSubmit={handleCreate}>
+              <div className="space-y-4 px-5 py-5">
+                <Input
+                  label="Customer / Company Name"
+                  placeholder="e.g., Acme Retail Ltd"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+                <Input
+                  label="Mobile Phone"
+                  placeholder="Optional"
+                  value={mobile}
+                  onChange={(e) => setMobile(e.target.value)}
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 border-t border-slate-200 bg-slate-50 px-5 py-3 dark:border-slate-800 dark:bg-slate-800/40">
+                <Button type="button" variant="ghost" onClick={() => setShowModal(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit">Save Customer</Button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
