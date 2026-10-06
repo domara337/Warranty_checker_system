@@ -7,24 +7,31 @@ import { Input } from '../common/Input';
 import { Select } from '../common/Select';
 import { Button } from '../common/Button';
 
+
+
 export const AddWarrantyForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
+ // State variables for form fields and data
   const [branches, setBranches] = useState<Branch[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [serialNumber, setSerialNumber] = useState('');
   const [labelId, setLabelId] = useState('');
-  const [productId, setProductId] = useState<number | ''>('');
-  const [branchId, setBranchId] = useState<number | ''>('');
-  const [customerId, setCustomerId] = useState<number | ''>('');
+  const [productId, setProductId] = useState<string | number | ''>('');
+  const [branchId, setBranchId] = useState<string | number | ''>('');
+  const [customerId, setCustomerId] = useState<string | number | ''>('');
   const [months, setMonths] = useState(24);
   const [startDate, setStartDate] = useState(() => new Date().toISOString().split('T')[0]);
 
+  // Fetch branches and products on component mount
   useEffect(() => {
     getBranches().then(setBranches);
+    
     getProducts().then(setProducts);
   }, []);
 
+
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!productId || !branchId || !customerId) {
@@ -38,12 +45,13 @@ export const AddWarrantyForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess
       const end = new Date(start);
       end.setMonth(end.getMonth() + Number(months));
 
+      // Call API to create warranty record
       await createWarranty({
         serial_number: serialNumber,
         label_id: labelId,
-        product_id: Number(productId),
-        branch_id: Number(branchId),
-        customer_id: Number(customerId),
+        product_id: productId,
+        branch_id: branchId,
+        customer_id: customerId,
         warranty_months: Number(months),
         warranty_start_date: startDate,
         warranty_end_date: end.toISOString().split('T')[0],
@@ -105,11 +113,13 @@ export const AddWarrantyForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess
         {/* Assignment */}
         <fieldset className="space-y-4 border-t border-slate-100 pt-6 dark:border-slate-800">
           <legend className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Assignment</legend>
+          
+          
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Select
               label="Product Model"
               value={productId}
-              onChange={(e) => setProductId(Number(e.target.value))}
+              onChange={(e) => setProductId(e.target.value)}
               required
             >
               <option value="">Select Product...</option>
@@ -123,7 +133,7 @@ export const AddWarrantyForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess
             <Select
               label="Branch"
               value={branchId}
-              onChange={(e) => setBranchId(Number(e.target.value))}
+              onChange={(e) => setBranchId(e.target.value)}
               required
             >
               <option value="">Select Branch...</option>
@@ -137,7 +147,7 @@ export const AddWarrantyForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess
 
           <CustomerSelect
             value={customerId}
-            onChange={(id) => setCustomerId(id === '' ? '' : Number(id))}
+            onChange={(id) => setCustomerId(id)}
           />
         </fieldset>
 

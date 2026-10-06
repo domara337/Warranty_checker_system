@@ -2,9 +2,9 @@ export interface WarrantyItem {
   id?: string | number;
   serial_number: string;
   label_id: string;
-  product_id: number;
-  branch_id: number;
-  customer_id: number;
+  product_id: string | number;
+  branch_id: string | number;
+  customer_id: string | number;
   warranty_months: number;
   warranty_start_date: string;
   warranty_end_date: string;

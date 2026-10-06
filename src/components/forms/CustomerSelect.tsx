@@ -65,11 +65,11 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({ value, onChange 
         </button>
       </div>
 
-      <Select value={value} onChange={(e) => onChange(e.target.value === '' ? '' : Number(e.target.value))}>
+      <Select value={value} onChange={(e) => onChange(e.target.value)}>
         <option value="">Select Customer...</option>
         {customers.map((c) => (
           <option key={c.id} value={c.id}>
-            {c.full_name} {c.mobile ? `(${c.mobile})` : ''}
+            {c.name} {c.mobile ? `(${c.mobile})` : ''}
           </option>
         ))}
       </Select>

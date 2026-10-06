@@ -20,7 +20,9 @@ export interface Product {
 
 export interface Customer {
   id: string | number;
-  full_name: string;
+  // The API returns the DB column `name` (see customers.model.ts).
+  // NOTE: POST /customers accepts `full_name` in the request body instead.
+  name: string;
   mobile?: string;
   city?: string;
   address?:string;
